@@ -4,46 +4,88 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\UserModel as User; 
-use App\Models\WorkModel;
+use Illuminate\Support\Facades\Auth;
+use App\Models\AvatarModel as Avatar;
 
 class UserController extends Controller
 {
-    public function register(Request $req){
-        $req->validate([
-            'name' => 'required|string',
-            'gender' => 'required|string|in:Male,Female',
-            'works' => 'required|array|min:3',
-            'works.*' => 'required|string',
-            'linkedin' => 'required|string|regex:/^https:\/\/www\.linkedin\.com\/in\/[a-zA-Z0-9_-]+$/',
-            'mobile_number' => 'required|digits_between:10,15|unique:users',
-            'email' => 'required|email|unique:users',
-            'password'=> 'required|string|min:6',
-            'confirm_password' => 'required|same:password',
-            'registration_price' => 'required|numeric|between:100000,125000',
-            
-        ]);
-
-        $user = User::create([
-            'name' => $req['name'],
-            'gender' => $req['gender'],
-            'linkedin' => $req['linkedin'],
-            'mobile_number' => $req['mobile_number'],
-            'email' => $req['email'],
-            'password' => bcrypt($req['password']),
-            'registration_price' => $req['registration_price'],
-        ]);
-
-        foreach ($req['works'] as $work) {
-            WorkModel::create([
-                'name' => $work,
-                'user_id' => $user->id,
-            ]);
-        }
-
-        return redirect()->route('login');
+    public function register(){
+        return redirect()->route('payment.form');
     }
+
+    public function login(Request $req){
+        $validate = $req->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6'
+        ]);
+    }
+
     public function showRegisterForm(){
         return view('auth.register');
+    }
+
+    public function showPaymentForm(){
+        return view('user.payment-page');
+    }
+    
+    public function processPayment(Request $req){
+
+        if($req->coins < 0){
+            return redirect()->back()->with('error', 'Please re-enter amount!');
+        }
+
+        $user = Auth::user();
+
+        $user->update([
+            'coins' => 100 + $req->coins,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Payment confirmed successfully!');
+    }
+
+    public function viewChangeVisible(){
+        $user = Auth::user();
+
+        return view('user.visibleSetting', ['user' => $user]);
+    }
+
+    public function purchaseVisibility(){
+        $user = Auth::user();
+
+        if($user->coins > 50 && $user->is_active == 1){
+            $user->coins -= 50;
+        } else {
+            return redirect()->route('home')->with('error', 'Insufficient coins!');
+        }
+        $user->is_active = 0;
+
+        $randomInt = random_int(1,3);
+        $user->profile_picture = 'assets/bear'.$randomInt.'.jpg';
+        $user->save();
+
+        return redirect()->route('home')->with('success', 'Visibility purchased successfully!');
+    }
+
+    public function deactivateVisiblity(){
+        $user = Auth::user();
+
+        if($user->coins > 5 && $user->is_active == 0){
+            $user->coins -= 5;
+        } else {
+            return redirect()->route('home')->with('error', 'Insufficient coins!');
+        }
+
+        $user->is_active = 1;
+        $user->profile_picture = 'assets/default.jpg';
+        $user->save();
+
+        return redirect()->route('home')->with('success', 'Visibility deactivated successfully!');
+    }
+
+    public function viewShop(){
+        $user = Auth::user();
+        $avatars = Avatar::all();
+
+        return view('user.shop', ['user' => $user, 'avatars' => $avatars]);
     }
 }

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use App\Models\WorkModel;
 
 class RegisterController extends Controller
 {
@@ -28,7 +28,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/payment-form';
 
     /**
      * Create a new controller instance.
@@ -49,9 +49,16 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'name' => 'required|string',
+            'gender' => 'required|string|in:Male,Female',
+            'works' => 'required|array|min:3',
+            'works.*' => 'required|string',
+            'linkedin' => 'required|string|regex:/^https:\/\/www\.linkedin\.com\/in\/[a-zA-Z0-9_-]+$/',
+            'mobile_number' => 'required|digits_between:10,15|unique:users',
+            'email' => 'required|email|unique:users',
+            'password'=> 'required|string|min:6',
+            'confirm_password' => 'required|same:password',
+            'registration_price' => 'required|numeric|between:100000,125000',
         ]);
     }
 
@@ -63,10 +70,23 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
+            'gender' => $data['gender'],
+            'linkedin' => $data['linkedin'],
+            'mobile_number' => $data['mobile_number'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => bcrypt($data['password']),
+            'registration_price' => $data['registration_price'],
+            'profile_picture' => 'assets/default.jpg',
         ]);
+
+        foreach ($data['works'] as $work) {
+            WorkModel::create([
+                'name' => $work,
+                'user_id' => $user->id,
+            ]);
+        }
+        return $user;
     }
 }

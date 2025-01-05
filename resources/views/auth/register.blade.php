@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('navbar')
+    @include('components.navbar')
+@endsection
+
 @section('content')
 
 @if($errors->any())
@@ -19,7 +23,7 @@
                 <div class="card-header">{{ __('Register') }}</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('register.submit') }}" onsubmit="return formValidation();">
+                    <form method="POST" action="{{ route('register') }}" onsubmit="return formValidation();">
                         @csrf
 
                         <div class="row mb-3">
