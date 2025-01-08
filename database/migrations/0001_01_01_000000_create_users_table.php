@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('registration_price');
             $table->integer('coins')->nullable();
             $table->string('profile_picture')->nullable();
-            $table->string('profession');
+            $table->string('profession')->default('Unemployed');
             $table->boolean('is_active')->default(true);
 
             $table->timestamp('email_verified_at')->nullable();

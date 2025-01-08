@@ -36,6 +36,10 @@
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('user.friends') }}">{{ __('Friends') }}</a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('view-shop') }}">{{ __('Shop') }}</a>
                     </li>
 

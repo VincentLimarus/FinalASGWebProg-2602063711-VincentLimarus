@@ -22,3 +22,18 @@ Route::post('deactivate-visible', [UserController::class, 'deactivateVisiblity']
 
 Route::get('shop-avatar', [UserController::class, 'viewShop'])->name('view-shop')->middleware('auth');
 Route::post('shop-avatar/buy/{id}', [AvatarController::class, 'buyAvatar'])->name('buy-avatar.submit')->middleware('auth');
+Route::post('shop-avatar/equip/{id}', [AvatarController::class, 'equipAvatar'])->name('equip-avatar.submit')->middleware('auth');
+
+Route::get('search-users', [UserController::class, 'searchUsers'])->name('search-users')->middleware('auth');
+Route::get('friends', [UserController::class, 'viewFriends'])->name('user.friends')->middleware('auth');
+
+Route::post('send-friend-request/{id}', [UserController::class, 'requestAddFriend'])->name('send-friend-request.submit')->middleware('auth');
+
+Route::post('delete-friend/{id}', [UserController::class, 'deleteFriend'])->name('delete-friend.submit')->middleware('auth');
+Route::post('delete-request/{id}', [UserController::class, 'deleteRequest'])->name('delete-request.submit')->middleware('auth');
+
+Route::post('delete-friend-request/{id}', [UserController::class, 'deleteRequestFromUser'])->name('delete-friend-request.submit')->middleware('auth');
+Route::post('accept-friend-request/{id}', [UserController::class, 'acceptRequest'])->name('accept-friend-request.submit')->middleware('auth');
+
+
+

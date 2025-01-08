@@ -52,4 +52,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(WorkModel::class);
     }
+
+    public function friends(): HasMany
+    {
+        return $this->hasMany(FriendModel::class);
+    }
+
 }

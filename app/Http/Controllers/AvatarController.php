@@ -38,4 +38,13 @@ class AvatarController extends Controller
             return redirect()->route('view-shop')->with('error', 'Insufficient coins!');
         }
     }
+
+    public function equipAvatar(Request $req){
+        $user = Auth::user();
+        $avatar = Avatar::find($req->id);   
+
+        $user->profile_picture = $avatar->profile_url;
+        $user->save();
+        return redirect()->route('view-shop')->with('success', 'Avatar equipped successfully!');
+    }
 }

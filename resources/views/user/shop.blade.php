@@ -20,7 +20,7 @@
         </div>
         <hr>
 
-        <h6 class="display-6 fw-normal mt-2 mb-2">Discover All Avatar that Available at <span style="color: darkblue">ConnectFriend!</span></h6>
+        <h6 class="display-6 fw-normal mt-2 mb-2">Discover <span style="color: darkblue">All Avatars</span> that Available at <span style="color: darkblue">ConnectFriend!</span></h6>
 
         <div class="d-flex flex-wrap" style="gap: 20px">
             @forelse ($avatars as $avatar)  
@@ -40,11 +40,39 @@
                 <p>No avatar available.</p>
             @endforelse
         </div>
+
+        <hr class="mt-5">
+
+        <h6 class="display-6 mt-4 fw-normal">Equip Your Inventory, <span style="color: darkblue">All Avatars</span> You Have Purchased</h6>
+        
+        <div class="d-flex flex-wrap" style="gap: 20px">
+            @forelse ($avatarsOwned as $ao)
+                <div class="card mt-2" style="width: 14rem; height: 21rem;">
+                    <img src="{{ asset($ao->avatar->profile_url) }}" class="card-img-top" alt="..." style="object-fit: cover; height: 150px;">
+
+                    <div class="card-body d-flex flex-column" style="flex-grow: 1;">
+                        <h6 class="fw-bold">{{$ao->avatar->name}}</h6>
+                        <p>You Bought the Avatar at: <span class="fw-bold">{{$ao->avatar->created_at}}</span></p>
+                    </div>
+                    <form method="POST" action="{{ route('equip-avatar.submit', $ao->avatar->id) }}" onsubmit="return confirmEquip();">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">Equip Avatar</button>
+                    </form>
+                </div>
+            @empty
+                
+            @endforelse
+
+        </div>
     </div>
 
     <script>
         function confirmPurchase() {
             return confirm('Are you sure you want to purchase this avatar?');
+        }
+
+        function confirmEquip() {
+            return confirm('Are you sure you want to Equip this avatar?');
         }
 
         @if(session('error'))
